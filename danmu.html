@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
-
+        canvas {
+            border: 1px solid #f00;
+        }
     </style>
     <script>
         onload = function () {
@@ -19,13 +21,12 @@
             Danmu({
                 strs: strs,
                 width: 300,
-                height: 300,
-                row: 3,
+                row: 4,
                 fontSize: 20,
-                speed: 0.5,
+                speed: 2.5,
                 color: "#ff00ff",
                 opacity: 0.5,
-                delay: 2000
+                delay: 500
             }).run();
         }
 
@@ -41,8 +42,8 @@
             var opacity = param.opacity;
 
             var canvas = document.createElement('canvas');
-            canvas.width = 300;
-            canvas.height = 600;
+            canvas.width = width;
+            canvas.height = fontSize * row * 1.4;
             var ctx = canvas.getContext('2d');
             var container = document.getElementById('danmu');
             container.appendChild(canvas);
