@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+
+    </style>
+    <script>
+        onload = function () {
+            var strs = [
+                "hello",
+                "hello world",
+                "hello world lisper",
+                "you are best",
+                "good morning"
+            ];
+
+            Danmu({
+                strs: strs,
+                width: 300,
+                height: 300,
+                row: 3,
+                fontSize: 20,
+                speed: 0.5,
+                color: "#ff00ff",
+                opacity: 0.5,
+                delay: 2000
+            }).run();
+        }
+
+        function Danmu(param) {
+            var strs = param.strs;
+            var width = param.width;
+            var height = param.height;
+            var row = param.row;
+            var fontSize = param.fontSize;
+            var speed = param.speed;
+            var delay = param.delay;
+            var color = param.color;
+            var opacity = param.opacity;
+
+            var canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 600;
+            var ctx = canvas.getContext('2d');
+            var container = document.getElementById('danmu');
+            container.appendChild(canvas);
+
+            ctx.fillStyle = color;
+            ctx.font = fontSize + "px sans-serif";
+            ctx.globalAlpha = opacity;
+
+            function getRandomStr() {
+                var index = Math.round(Math.random() * (strs.length - 1));
+                return strs[index];
+            }
+
+            function Text(str, x, y) {
+                this.isDie = false;
+                this.width = ctx.measureText(str).width;
+                this.y = y;
+
+                this.getLeavePos = function () {
+                    return x + this.width;
+                }
+
+                this.update = function () {
+                    x -= speed;
+                    ctx.fillText(str, x, y);
+                    if (x < -200) {
+                        this.isDie = true;
+                    }
+                }
+            }
+
+
+            function TextList() {
+                var array = [];
+                var lastY = null;
+
+                function checkTextReady(y) {
+                    for (var i = array.length - 1; i >= 0; i--) {
+                        var text = array[i];
+                        if (text.y === y) {
+                            return text.getLeavePos();
+                        }
+                    }
+                    return 0;
+                }
+
+                this.add = function () {
+                    var str = getRandomStr();
+                    var y = null;
+                    do {
+                        y = Math.round((1 + Math.random() * (row - 1))) * (fontSize * 1.2);
+                    } while (y === lastY);
+                    if (checkTextReady(y) < width) {
+                        array.push(new Text(str, width + 10, y));
+                        lastY = y;
+                    }
+                }
+
+                this.update = function () {
+                    for (var i = array.length - 1; i >= 0; i--) {
+                        var text = array[i];
+                        text.update();
+                        if (text.isDie) {
+                            array.splice(i, 1);
+                        }
+                    }
+                }
+            }
+
+            var textList = new TextList();
+            var isRuning = false;
+
+            setInterval(function () {
+                textList.add();
+            }, delay);
+
+            function animate() {
+                if (isRuning) {
+                    render();
+                    requestAnimationFrame(animate);
+                }
+            }
+
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                textList.update();
+            }
+
+            return {
+                run: function () {
+                    isRuning = true;
+                    animate();
+                },
+                stop: function () {
+                    isRuning = false;
+                }
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+<div id="danmu">
+
+</div>
+
+</body>
+</html>
